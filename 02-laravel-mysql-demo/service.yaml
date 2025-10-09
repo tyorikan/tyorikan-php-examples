@@ -1,0 +1,91 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  # このサービスの名前。README.md の SERVICE_NAME 変数で置換されます。
+  name: YOUR_SERVICE_NAME
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        # メインコンテナがサイドカーに依存することを定義します。
+        run.googleapis.com/container-dependencies: '{"laravel-app":["cloud-sql-proxy"]}'
+        # オートスケーリングの最大インスタンス数。
+        autoscaling.knative.dev/maxScale: '100'
+        # 起動時のCPUをブーストしてコールドスタートを高速化します。
+        run.googleapis.com/startup-cpu-boost: 'true'
+        # プライベートIP範囲への通信のみVPCを経由させます。
+        run.googleapis.com/vpc-access-egress: private-ranges-only
+        # 接続するVPCネットワークを定義します。
+        run.googleapis.com/network-interfaces: '[{"network":"default"}]'
+    spec:
+      containerConcurrency: 80
+      # このサービスが使用するサービスアカウント。README.md の SERVICE_ACCOUNT 変数で置換されます。
+      serviceAccountName: YOUR_SERVICE_ACCOUNT
+      containers:
+      # --- メインのLaravelアプリケーションコンテナ ---
+      - image: '# THIS WILL BE REPLACED BY THE BUILD COMMAND'
+        name: laravel-app
+        ports:
+        - containerPort: 8080
+        env:
+        - name: APP_ENV
+          value: "production"
+        - name: APP_DEBUG
+          value: "false"
+        - name: APP_KEY
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: YOUR_APP_KEY_SECRET_NAME # Laravel用のAPP_KEY Secret
+        - name: DB_CONNECTION
+          value: "mysql"
+        - name: DB_HOST
+          value: "127.0.0.1" # TCPでサイドカーのProxyに接続
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_DATABASE
+          value: YOUR_DB_NAME
+        - name: DB_USERNAME
+          value: YOUR_DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: YOUR_DB_PASSWORD_SECRET_NAME # DBパスワードのSecret
+        # Cloud Runのファイルシステムは揮発性のため、セッションとキャッシュにはDBを利用します。
+        - name: SESSION_DRIVER
+          value: "database"
+        - name: CACHE_DRIVER
+          value: "database"
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        startupProbe:
+          failureThreshold: 3
+          periodSeconds: 5
+          timeoutSeconds: 3
+          httpGet:
+            path: /healthz # Laravelで作成したヘルスチェックエンドポイント
+            port: 8080
+      # --- Cloud SQL Auth Proxy サイドカーコンテナ ---
+      - image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:latest
+        name: cloud-sql-proxy
+        args:
+        - "--structured-logs"
+        - "--port=3306"
+        - "--private-ip"
+        - "--address=0.0.0.0"
+        - "YOUR_INSTANCE_CONNECTION_NAME" # インスタンス接続名
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+        startupProbe:
+          tcpSocket:
+            port: 3306
+          periodSeconds: 5
+          timeoutSeconds: 1
+          failureThreshold: 3
