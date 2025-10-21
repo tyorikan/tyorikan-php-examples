@@ -50,7 +50,7 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 3
           httpGet:
-            path: /healthz.php
+            path: /health
             port: 8080
       # --- Cloud SQL Auth Proxy サイドカーコンテナ ---
       - image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:latest

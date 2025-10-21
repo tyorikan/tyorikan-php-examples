@@ -12,7 +12,7 @@
 *   **データベース**: Cloud SQL for MySQL (プライベートIP経由で接続)
 *   **セキュアな接続**: Direct VPC Egress
 *   **コネクションプーリング**: Cloud SQL Auth Proxy (サイドカーコンテナとして)
-*   **ヘルスチェック**: アプリケーションとプロキシ双方のカスタム起動プローブ
+*   **ヘルスチェック**: アプリケーションとプロキシ双方のカスタム起動プローブ (`/health` エンドポイント)
 *   **構成管理**: `service.yaml` を用いた Infrastructure as Code (IaC) アプローチ
 *   **ローカル開発環境**: `podman-compose` とローカルMySQLデータベース
 
@@ -257,7 +257,7 @@ gcloud run services replace service.yaml \
 *   **`APP_KEY` が自動設定されない**: コンテナ内からホストのファイルを書き換えるのは、セキュリティ上の制約で失敗することがあります。`artisan key:generate --show` でキーを表示させ、手動で `.env` にコピー＆ペーストするのが最も確実な方法です。
 *   **`run` 実行時にDB接続エラーが出る**: `podman-compose run` は `depends_on` で指定されたサービスを自動起動しません。DB接続が必要なコマンドの場合は、先に `podman-compose up -d db` でDBコンテナを起動しておく必要があります。
 *   **イメージの変更が反映されない**: `entrypoint.sh` などを修正した後に `podman-compose run` を実行しても、変更は反映されません。`podman-compose build` を実行して、イメージを明示的に再ビルドする必要があります。
-*   **Cloud Run での起動プローブの失敗**: 必ず Cloud Run のログを確認します。`healthz` エンドポイントでDB接続エラーが出ていないか、NginxやPHP-FPMのエラーがないかを確認します。
+*   **Cloud Run での起動プローブの失敗**: 必ず Cloud Run のログを確認します。`health` エンドポイントでDB接続エラーが出ていないか、NginxやPHP-FPMのエラーがないかを確認します。
 *   **Secret Manager へのアクセス権**: `service.yaml` で指定した `serviceAccountName` に `roles/secretmanager.secretAccessor` が付与されていることを確認してください。
 
 ## クリーンアップ

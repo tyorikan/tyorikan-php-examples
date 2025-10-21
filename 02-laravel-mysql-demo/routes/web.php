@@ -13,7 +13,7 @@ Route::get('/', function () {
     }
 });
 
-Route::get('/healthz', function () {
+Route::get('/health', function () {
     try {
         // PDOインスタンスを取得しようとすることで、接続を試みます。
         DB::connection()->getPdo();

@@ -44,7 +44,7 @@
 
 *   `.env`: ローカル用の環境変数ファイル
 *   `index.php`: メインのアプリケーション
-*   `healthz.php`: ヘルスチェック用エンドポイント
+*   `health.php`: ヘルスチェック用エンドポイント
 *   `nginx.conf.template`: Nginx の設定テンプレート
 *   `entrypoint.sh`: コンテナ起動スクリプト
 *   `Dockerfile`: コンテナイメージの定義
