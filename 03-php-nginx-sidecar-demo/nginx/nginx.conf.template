@@ -1,0 +1,25 @@
+server {
+    listen ${PORT};
+    server_name _;
+
+    root /var/www/html;
+    index index.php;
+
+    location /health {
+        try_files $uri $uri/ /health.php?$query_string;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass ${PHP_FPM_HOST}:9000;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}

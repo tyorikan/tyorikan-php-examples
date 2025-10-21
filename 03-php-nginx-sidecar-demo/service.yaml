@@ -1,0 +1,89 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  # このサービスの名前。README.md の SERVICE_NAME 変数で置換されます。
+  name: hello-php-nginx
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        # メインコンテナがサイドカーに依存することを定義します。
+        run.googleapis.com/container-dependencies: '{"nginx-1":["php-app-1"], "php-app-1":["cloud-sql-proxy"]}'
+        # オートスケーリングの最大インスタンス数。
+        autoscaling.knative.dev/maxScale: '100'
+        # 起動時のCPUをブーストしてコールドスタートを高速化します。
+        run.googleapis.com/startup-cpu-boost: 'true'
+        # プライベートIP範囲への通信のみVPCを経由させます。
+        run.googleapis.com/vpc-access-egress: private-ranges-only
+        # 接続するVPCネットワークを定義します。
+        run.googleapis.com/network-interfaces: '[{"network":"default"}]'
+    spec:
+      containerConcurrency: 80
+      # このサービスが使用するサービスアカウント。README.md の SERVICE_ACCOUNT 変数で置換されます。
+      serviceAccountName: 932743391310-compute@developer.gserviceaccount.com
+      containers:
+      # --- Nginx コンテナ ---
+      - image: asia-northeast1-docker.pkg.dev/yorikane-alto-dev/php-repo/nginx:20251021-172937
+        name: nginx-1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PHP_FPM_HOST
+          value: "localhost" # PHP-FPM は localhost で動作
+        resources:
+          limits:
+            cpu: 500m # Nginx は PHP-FPM よりリソースを少なくする
+            memory: 256Mi
+        startupProbe:
+          failureThreshold: 3
+          periodSeconds: 5
+          timeoutSeconds: 3
+          httpGet:
+            path: /health
+            port: 8080
+      # --- PHP-FPM アプリケーションコンテナ ---
+      - image: asia-northeast1-docker.pkg.dev/yorikane-alto-dev/php-repo/php-app:20251021-172937
+        name: php-app-1
+        env:
+        - name: DB_HOST
+          value: 127.0.0.1 # サイドカーのProxyに接続
+        - name: DB_DATABASE
+          value: demo # DB名
+        - name: DB_USERNAME
+          value: tyorikan # DBユーザー名
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: mysql-demo-password-tyorikan # Secret名
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        startupProbe:
+          tcpSocket:
+            port: 9000
+          periodSeconds: 5
+          timeoutSeconds: 1
+          failureThreshold: 3
+      # --- Cloud SQL Auth Proxy サイドカーコンテナ ---
+      - image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:latest
+        name: cloud-sql-proxy
+        args:
+        - "--structured-logs"
+        - "--port=3306"
+        - "--private-ip"
+        - "--address=0.0.0.0"
+        - "yorikane-alto-dev:asia-northeast1:mysql-demo" # インスタンス接続名
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+        startupProbe:
+          tcpSocket:
+            port: 3306
+          periodSeconds: 5
+          timeoutSeconds: 1
+          failureThreshold: 3
