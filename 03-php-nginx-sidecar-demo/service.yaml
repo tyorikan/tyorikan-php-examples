@@ -2,7 +2,7 @@ apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
   # このサービスの名前。README.md の SERVICE_NAME 変数で置換されます。
-  name: hello-php-nginx
+  name: YOUR_SERVICE_NAME
   annotations:
     run.googleapis.com/ingress: all
 spec:
@@ -22,10 +22,10 @@ spec:
     spec:
       containerConcurrency: 80
       # このサービスが使用するサービスアカウント。README.md の SERVICE_ACCOUNT 変数で置換されます。
-      serviceAccountName: 932743391310-compute@developer.gserviceaccount.com
+      serviceAccountName: YOUR_SERVICE_ACCOUNT
       containers:
       # --- Nginx コンテナ ---
-      - image: asia-northeast1-docker.pkg.dev/yorikane-alto-dev/php-repo/nginx:20251021-172937
+      - image: '# THIS WILL BE REPLACED BY THE BUILD COMMAND (nginx)'
         name: nginx-1
         ports:
         - containerPort: 8080
@@ -44,20 +44,20 @@ spec:
             path: /health
             port: 8080
       # --- PHP-FPM アプリケーションコンテナ ---
-      - image: asia-northeast1-docker.pkg.dev/yorikane-alto-dev/php-repo/php-app:20251021-172937
+      - image: '# THIS WILL BE REPLACED BY THE BUILD COMMAND (php-app)'
         name: php-app-1
         env:
         - name: DB_HOST
           value: 127.0.0.1 # サイドカーのProxyに接続
         - name: DB_DATABASE
-          value: demo # DB名
+          value: YOUR_DB_NAME # DB名
         - name: DB_USERNAME
-          value: tyorikan # DBユーザー名
+          value: YOUR_DB_USER # DBユーザー名
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
               key: latest
-              name: mysql-demo-password-tyorikan # Secret名
+              name: YOUR_SECRET_NAME # Secret名
         resources:
           limits:
             cpu: 1000m
@@ -76,7 +76,7 @@ spec:
         - "--port=3306"
         - "--private-ip"
         - "--address=0.0.0.0"
-        - "yorikane-alto-dev:asia-northeast1:mysql-demo" # インスタンス接続名
+        - "YOUR_INSTANCE_CONNECTION_NAME" # インスタンス接続名
         resources:
           limits:
             cpu: "1"
