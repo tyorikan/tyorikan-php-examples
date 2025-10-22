@@ -12,7 +12,7 @@
 
 ## ファイル構成
 
-- `index.php`: アプリケーション本体。`phpinfo()` を表示します。
+- `index.php`: アプリケーション本体。簡単なメッセージを表示します。
 - `composer.json`: PHP のバージョンを指定し、Buildpacks にこのプロジェクトが PHP であることを伝えます。
 - `project.toml`: `Dockerfile` の代わりとなる設定ファイル。Nginx を有効にする設定などを記述します。
 - `compose.yaml`: `docker compose` でローカル実行するための定義ファイルです。
@@ -49,7 +49,7 @@ docker compose up
 
 ### ステップ 3: ブラウザで確認する
 
-ブラウザで `http://localhost:8080` にアクセスし、`phpinfo()` の画面が表示されれば成功です。
+ブラウザで `http://localhost:8080` にアクセスし、メッセージが表示されれば成功です。
 
 確認が終わったら、`Ctrl+C` でコンテナを停止してください。
 
@@ -74,7 +74,7 @@ gcloud run deploy "${SERVICE_NAME}" \
 
 このコマンド一発で、Cloud Build が裏側で `pack` と同じように Buildpacks を使ってコンテナイメージをビルドし、そのイメージを Cloud Run にデプロイしてくれます。
 
-デプロイが完了すると URL が表示されるので、アクセスして `phpinfo()` が表示されることを確認してください。
+デプロイが完了すると URL が表示されるので、アクセスしてメッセージが表示されることを確認してください。
 
 ## 3. カスタマイズ編
 
