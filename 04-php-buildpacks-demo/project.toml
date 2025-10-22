@@ -1,0 +1,14 @@
+# このファイルは、Buildpacks のための設定を定義します。
+# Dockerfile のない世界へようこそ！
+
+# Google Cloud Buildpacks のビルドフェーズで使用される環境変数を設定します。
+[[build.env]]
+# PHP ランタイムを使用することを指定します。
+name = "GOOGLE_RUNTIME"
+value = "php"
+
+# Nginx ウェブサーバーを有効にすることを指定します。
+# これにより、Buildpacks は自動的に Nginx をセットアップし、PHP-FPM と連携させます。
+[[build.env]]
+name = "NGINX"
+value = "true"

@@ -1,0 +1,11 @@
+services:
+  app:
+    # 'pack build php-buildpacks-app --builder gcr.io/buildpacks/builder' コマンドでビルドしたイメージを指定します。
+    image: php-buildpacks-app:latest
+    ports:
+      # ローカルの 8080 番ポートをコンテナの 8080 番ポートにマッピングします。
+      - "8080:8080"
+    environment:
+      # コンテナ内でリッスンするポートを環境変数 PORT として指定します。
+      # Cloud Run と同じ動作をエミュレートします。
+      - PORT=8080
