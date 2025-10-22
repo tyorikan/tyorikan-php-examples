@@ -14,7 +14,7 @@
 
 - `index.php`: アプリケーション本体。簡単なメッセージを表示します。
 - `composer.json`: PHP のバージョンを指定し、Buildpacks にこのプロジェクトが PHP であることを伝えます。
-- `project.toml`: `Dockerfile` の代わりとなる設定ファイル。Nginx を有効にする設定などを記述します。
+- `project.toml`: `Dockerfile` の代わりとなる Buildpacks 用の設定ファイルです。ビルド時の環境変数（例: Composer のバージョン）などを設定します。
 - `compose.yaml`: `docker compose` でローカル実行するための定義ファイルです。
 - `README.md`: このファイルです。
 
