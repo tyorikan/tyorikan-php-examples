@@ -2,13 +2,8 @@
 # Dockerfile のない世界へようこそ！
 
 # Google Cloud Buildpacks のビルドフェーズで使用される環境変数を設定します。
-[[build.env]]
-# PHP ランタイムを使用することを指定します。
-name = "GOOGLE_RUNTIME"
-value = "php"
 
-# Nginx ウェブサーバーを有効にすることを指定します。
-# これにより、Buildpacks は自動的に Nginx をセットアップし、PHP-FPM と連携させます。
+# Composer のバージョンを明示的に指定します。
 [[build.env]]
-name = "NGINX"
-value = "true"
+name = "GOOGLE_COMPOSER_VERSION"
+value = "2.2.20"
