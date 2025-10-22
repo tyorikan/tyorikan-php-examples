@@ -52,6 +52,6 @@ graph TD
 ```mermaid
 graph TD
     subgraph "Cloud Run Service"
-        User -- "HTTP/HTTPS" --> Container[Container<br>(Nginx + PHP-FPM)]
+        User -- "HTTP/HTTPS" --> Container["Container<br>(Nginx + PHP-FPM)"]
     end
 ```
