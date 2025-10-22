@@ -115,7 +115,7 @@ value = "my-nginx.conf"
 # Composer のバージョンを明示的に指定します。
 [[build.env]]
 name = "GOOGLE_COMPOSER_VERSION"
-value = "2.2.20"
+value = "2.8.12"
 ```
 
 指定しない場合は、Buildpacks に組み込まれたデフォルトのバージョンが使用されます。

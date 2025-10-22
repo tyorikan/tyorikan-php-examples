@@ -6,4 +6,4 @@
 # Composer のバージョンを明示的に指定します。
 [[build.env]]
 name = "GOOGLE_COMPOSER_VERSION"
-value = "2.2.20"
+value = "2.8.12"
