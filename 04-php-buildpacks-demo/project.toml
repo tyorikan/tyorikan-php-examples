@@ -1,0 +1,9 @@
+# このファイルは、Buildpacks のための設定を定義します。
+# Dockerfile のない世界へようこそ！
+
+# Google Cloud Buildpacks のビルドフェーズで使用される環境変数を設定します。
+
+# Composer のバージョンを明示的に指定します。
+[[build.env]]
+name = "GOOGLE_COMPOSER_VERSION"
+value = "2.8.12"
